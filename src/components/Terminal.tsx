@@ -1,7 +1,8 @@
-
 import React, { useState, useEffect, useRef } from 'react'
 import TypedOutput from './TypedOutput'
 import ProfileImage from './ProfileImage'
+import ContactForm from './ContactForm'
+import emailjs from '@emailjs/browser'
 
 const progressWidths = [
   'w-0',
@@ -137,10 +138,10 @@ const commands: Record<string, string[]> = {
   social: [
     '┌─── [ SOCIAL LINKS ] ────────────────────────────────────┐',
     '│                                                         │',
-    '│  GitHub    → github.com/bibekksah                       │',
-    '│  LinkedIn  → linkedin.com/in/bibek-kumar-sah/             │',
-    '│  Twitter   → twitter.com/bibeksah                       │',
-    '│  Instagram → instagram.com/bibeksah                     │',
+    '│  🐙GitHub    → github.com/bibekksah                     │',
+    '│  💼LinkedIn  → linkedin.com/in/bibek-kumar-sah/         │',
+    '│  🐦Twitter   → twitter.com/bibeksah                     │',
+    '│  📷Instagram → instagram.com/bibeksah                   │',
     '│                                                         │',
     '└─────────────────────────────────────────────────────────┘',
   ],
@@ -255,8 +256,13 @@ const Terminal: React.FC = () => {
   const [bootHistory, setBootHistory] = useState<HistoryItem[]>([])
   const [terminalHistory, setTerminalHistory] = useState<HistoryItem[]>([])
   const [bootComplete, setBootComplete] = useState(false)
+  const [showContactForm, setShowContactForm] = useState(false)
+  const [contactName, setContactName] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+  const [contactMessage, setContactMessage] = useState('')
+  const [contactStatus, setContactStatus] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const terminalBodyRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const promptPrefix = '(root@bibek)-[~/portfolio]'
   const promptSymbol = '~$'
@@ -320,7 +326,7 @@ const Terminal: React.FC = () => {
 
 Full-Stack Developer | Ethical Hacker
 
-Email: bibek@example.com
+Email: bibeksah98@gmail.com
 LinkedIn: linkedin.com/in/bibek-kumar-sah
 GitHub: github.com/bibeksah
 Website: bibeksah.dev
@@ -364,6 +370,7 @@ Certifications:
 
     if (cmd === 'clear') {
       setTerminalHistory([])
+      setShowContactForm(false)
       setInput('')
       return
     }
@@ -383,6 +390,22 @@ Certifications:
       return
     }
 
+    if (cmd === 'contact') {
+      setShowContactForm(true)
+      setContactStatus('')
+      setTerminalHistory(prev => [
+        ...prev,
+        {
+          type: 'command',
+          input: cmd,
+          output: 'Opening secure contact interface...\nFill in the form below to message me directly.',
+          animate: true,
+        },
+      ])
+      setInput('')
+      return
+    }
+
     const commandOutput = dynamicCommands[cmd]?.() || commands[cmd]
     const response = commandOutput
       ? commandOutput.join('\n')
@@ -392,6 +415,49 @@ Certifications:
     setInput('')
   }
 
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
+      setContactStatus('Please complete every field before sending.')
+      return
+    }
+
+    setContactStatus('Sending message...')
+
+    const serviceId = 'service_eca79oe'
+    const templateId = 'template_q70jbsl'
+    const publicKey = 'p2pvLKDf1fHYmwtQf'
+
+    if ([serviceId, templateId, publicKey].some(id => id.startsWith('YOUR_') || id === '')) {
+      setContactStatus('EmailJS is not configured. Replace the placeholder IDs in Terminal.tsx with your EmailJS values.')
+      return
+    }
+
+    try {
+      const templateParams = {
+        from_name: contactName,
+        from_email: contactEmail,
+        message: contactMessage,
+      }
+
+      await emailjs.send(serviceId, templateId, templateParams, publicKey)
+
+      setContactStatus('Message sent successfully. Thank you!')
+      setContactName('')
+      setContactEmail('')
+      setContactMessage('')
+    } catch (err) {
+      console.error('EmailJS error', err)
+      setContactStatus('Failed to send message. Please check your EmailJS configuration and try again.')
+    }
+  }
+
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight
+    }
+  }
+
   useEffect(() => {
     if (bootComplete && inputRef.current) {
       inputRef.current.focus()
@@ -399,12 +465,12 @@ Certifications:
   }, [bootComplete, terminalHistory])
 
   useEffect(() => {
-    if (bottomRef.current) {
+    if (scrollContainerRef.current) {
       requestAnimationFrame(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' })
+        scrollToBottom()
       })
     }
-  }, [terminalHistory, bootComplete])
+  }, [terminalHistory, bootComplete, showContactForm])
 
   const bootRootClass =
     'w-full h-full bg-black px-8 py-8 overflow-y-auto font-mono text-matrix text-[14px] leading-7'
@@ -425,8 +491,8 @@ Certifications:
         </div>
       </div>
 
-      <div ref={terminalBodyRef} className="p-5 h-[calc(100%-60px)] flex flex-col font-mono text-matrix leading-6">
-        <div className="flex-1 overflow-y-auto scroll-smooth">
+      <div className="p-5 h-[calc(100%-60px)] flex flex-col font-mono text-matrix leading-6">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto scroll-smooth no-scrollbar">
           <div className="min-h-full rounded-[28px] border border-green-500/20 bg-[#011006]/95 p-4 shadow-[inset_0_0_40px_rgba(11,57,13,0.35)]">
             {terminalHistory.map((item, index) => (
               <div key={index} className="mb-4 whitespace-pre text-sm">
@@ -456,9 +522,26 @@ Certifications:
           ))}
           <div ref={bottomRef} />
           </div>
+
+          {showContactForm && (
+            <ContactForm
+              name={contactName}
+              email={contactEmail}
+              message={contactMessage}
+              status={contactStatus}
+              onNameChange={setContactName}
+              onEmailChange={setContactEmail}
+              onMessageChange={setContactMessage}
+              onSubmit={handleContactSubmit}
+              onClose={() => {
+                setShowContactForm(false)
+                setContactStatus('')
+              }}
+            />
+          )}
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-4 text-[13px] text-green-300 whitespace-pre-line">
+          <form onSubmit={handleSubmit} className="mt-4 text-[13px] text-green-300 whitespace-pre-line">
           <div className="flex items-center gap-2 mt-2 text-green-200">
             <span className="text-green-400">{promptSymbol}</span>
             <input
@@ -501,4 +584,3 @@ Certifications:
 }
 
 export default Terminal
-  
