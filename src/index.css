@@ -1,0 +1,89 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+  font-family: 'Courier New', monospace;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at top, rgba(32, 194, 14, 0.08), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(32, 194, 14, 0.05), transparent 18%);
+  pointer-events: none;
+}
+
+.bg-terminal {
+  background-color: rgba(10, 10, 10, 0.95);
+}
+
+.text-matrix {
+  color: #20c20e;
+}
+
+.glitch {
+  text-shadow: 0 0 6px #20c20e, 0 0 16px rgba(32, 194, 14, 0.55);
+}
+
+.neon-text {
+  text-shadow: 0 0 8px #20c20e, 0 0 18px rgba(32, 194, 14, 0.35);
+}
+
+::selection {
+  background: rgba(32, 194, 14, 0.25);
+  color: #fff;
+}
+
+input::placeholder {
+  color: rgba(32, 194, 14, 0.55);
+}
+
+:root {
+  --text-glow: 0 0 10px rgba(32, 194, 14, 0.75), 0 0 18px rgba(32, 194, 14, 0.25);
+}
+
+.terminal-scanline::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 2px;
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.bg-background {
+  background: rgba(1, 6, 3, 0.96);
+}
+
+.text-foreground {
+  color: #a5f49d;
+}
+
+.text-accent {
+  color: #7ef5a1;
+}
+
+.text-muted-foreground {
+  color: #8fd19b;
+}
+
+.text-destructive {
+  color: #ff6b6b;
+}
+
+.terminal-panel {
+  box-shadow: 0 0 120px rgba(32, 194, 14, 0.25);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(32, 194, 14, 0.75), 0 0 20px rgba(32, 194, 14, 0.25);
+}
+  
