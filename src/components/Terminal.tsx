@@ -26,12 +26,30 @@ interface HistoryItem {
   progress?: number
 }
 
+function GlitchNameHeader() {
+  return (
+    <div className="flex items-center justify-between px-5 py-3 border-b border-green-500/10 bg-[#021005]/90">
+      <div className="flex items-center gap-3">
+        <div className="w-3 h-3 rounded-full bg-[#ff5f56] shadow-[0_0_8px_rgba(255,95,86,0.45)]" />
+        <div className="w-3 h-3 rounded-full bg-[#ffbd2e] shadow-[0_0_8px_rgba(255,189,46,0.35)]" />
+        <div className="w-3 h-3 rounded-full bg-[#27c93f] shadow-[0_0_8px_rgba(39,201,63,0.35)]" />
+        <div className="text-[11px] text-green-300 uppercase tracking-[0.3em]">
+          root@bibek-hackbox:~/portfolio -- bash
+        </div>
+      </div>
+      <div className="font-mono text-[12px] uppercase text-green-300 tracking-[0.39em] glitch">
+        BIBEK KUMAR SAH
+      </div>
+    </div>
+  )
+}
+
 const commands: Record<string, string[]> = {
   help: [
     '┌──────────────────────────────────────────────┐',
     '│  Available Commands:                         │',
     '│──────────────────────────────────────────────│',
-    '│  about      → Who is Bibek Kumar Sah?       │',
+    '│  about      → Who is Bibek Kumar Sah?        │',
     '│  skills     → Technical arsenal              │',
     '│  projects   → Featured projects              │',
     '│  education  → Academic background            │',
@@ -448,7 +466,7 @@ Certifications:
       setContactMessage('')
     } catch (err) {
       console.error('EmailJS error', err)
-      setContactStatus('Failed to send message. Please check your EmailJS configuration and try again.')
+      setContactStatus('Failed to send message. Please check try again.')
     }
   }
 
@@ -473,112 +491,99 @@ Certifications:
   }, [terminalHistory, bootComplete, showContactForm])
 
   const bootRootClass =
-    'w-full h-full bg-black px-8 py-8 overflow-y-auto font-mono text-matrix text-[14px] leading-7'
+    'w-full h-[calc(100%-60px)] bg-black px-8 py-8 overflow-y-auto font-mono text-matrix text-[14px] leading-7'
   const mainRootClass =
     'w-full max-w-5xl h-[640px] bg-[#031106]/95 rounded-[32px] shadow-[0_0_120px_rgba(32,194,14,0.25)] overflow-hidden border-2 border-green-400/30 backdrop-blur-sm'
 
-  return bootComplete ? (
+  return (
     <div className={mainRootClass}>
-      <div className="flex items-center justify-between px-5 py-3 border-b border-green-500/10 bg-[#021005]/90">
-        <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-          <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-          <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-          <div className="text-[11px] text-green-300 uppercase tracking-[0.3em]">root@bibek-hackbox:~/portfolio -- bash</div>
-        </div>
-        <div className="font-mono text-[12px] uppercase text-green-300 tracking-[0.35em] glitch">
-          BIBEK KUMAR SAH
-        </div>
-      </div>
-
-      <div className="p-5 h-[calc(100%-60px)] flex flex-col font-mono text-matrix leading-6">
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto scroll-smooth no-scrollbar">
-          <div className="min-h-full rounded-[28px] border border-green-500/20 bg-[#011006]/95 p-4 shadow-[inset_0_0_40px_rgba(11,57,13,0.35)]">
-            {terminalHistory.map((item, index) => (
-              <div key={index} className="mb-4 whitespace-pre text-sm">
-              {item.type === 'command' && (
-                <div className="mb-2 text-green-200">
-                  <span className="text-green-300">{promptPrefix}</span>
-                  <span className="text-green-400 ml-2">{promptSymbol}</span>
-                  <span className="ml-2">{item.input}</span>
-                </div>
-              )}
-              {item.type === 'command' ? (
-                item.output.split('\n').map((line, lineIndex) =>
-                  line === '__PROFILE_IMAGE__' ? (
-                    <div key={`${index}-${lineIndex}`} className="mb-4 flex justify-center">
-                      <div className="w-36 h-36 rounded-full border border-green-400/20 bg-[#051507]/90 p-2 shadow-[0_0_20px_rgba(16,248,94,0.12)]">
-                        <ProfileImage />
-                      </div>
+      <GlitchNameHeader />
+      {bootComplete ? (
+        <div className="p-5 h-[calc(100%-60px)] flex flex-col font-mono text-matrix leading-6">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto scroll-smooth no-scrollbar">
+            <div className="min-h-full rounded-[28px] border border-green-500/20 bg-[#011006]/95 p-4 shadow-[inset_0_0_40px_rgba(11,57,13,0.35)]">
+              {terminalHistory.map((item, index) => (
+                <div key={index} className="mb-4 whitespace-pre text-sm">
+                  {item.type === 'command' && (
+                    <div className="mb-2 text-green-200">
+                      <span className="text-green-300">{promptPrefix}</span>
+                      <span className="text-green-400 ml-2">{promptSymbol}</span>
+                      <span className="ml-2">{item.input}</span>
                     </div>
+                  )}
+                  {item.type === 'command' ? (
+                    item.output.split('\n').map((line, lineIndex) =>
+                      line === '__PROFILE_IMAGE__' ? (
+                        <div key={`${index}-${lineIndex}`} className="mb-4 flex justify-center">
+                          <div className="w-36 h-36 rounded-full border border-green-400/20 bg-[#051507]/90 p-2 shadow-[0_0_20px_rgba(16,248,94,0.12)]">
+                            <ProfileImage />
+                          </div>
+                        </div>
+                      ) : (
+                        <TypedOutput key={`${index}-${lineIndex}`} text={line} animate />
+                      )
+                    )
                   ) : (
-                    <TypedOutput key={`${index}-${lineIndex}`} text={line} animate />
-                  )
-                )
+                    <div className="whitespace-pre">{item.output}</div>
+                  )}
+                </div>
+              ))}
+              <div ref={bottomRef} />
+            </div>
+
+            {showContactForm && (
+              <ContactForm
+                name={contactName}
+                email={contactEmail}
+                message={contactMessage}
+                status={contactStatus}
+                onNameChange={setContactName}
+                onEmailChange={setContactEmail}
+                onMessageChange={setContactMessage}
+                onSubmit={handleContactSubmit}
+                onClose={() => {
+                  setShowContactForm(false)
+                  setContactStatus('')
+                }}
+              />
+            )}
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-4 text-[13px] text-green-300 whitespace-pre-line">
+            <div className="flex items-center gap-2 mt-2 text-green-200">
+              <span className="text-green-400">{promptSymbol}</span>
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                className="bg-transparent border-none outline-none text-green-200 w-full placeholder:text-green-500/50"
+                placeholder="help"
+                autoFocus
+              />
+            </div>
+          </form>
+        </div>
+      ) : (
+        <div className={bootRootClass}>
+          {bootHistory.map((item, index) => (
+            <div key={index} className="whitespace-pre-line mb-1">
+              {item.progress !== undefined ? (
+                <>
+                  <div>{item.output}</div>
+                  <div className="mt-1 h-2 w-full rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full bg-gradient-to-r from-green-400 via-lime-300 to-green-600 ${progressWidths[Math.min(10, Math.floor((item.progress ?? 0) / 10))]}`}
+                    />
+                  </div>
+                </>
               ) : (
-                <div className="whitespace-pre">{item.output}</div>
+                item.output
               )}
             </div>
           ))}
-          <div ref={bottomRef} />
-          </div>
-
-          {showContactForm && (
-            <ContactForm
-              name={contactName}
-              email={contactEmail}
-              message={contactMessage}
-              status={contactStatus}
-              onNameChange={setContactName}
-              onEmailChange={setContactEmail}
-              onMessageChange={setContactMessage}
-              onSubmit={handleContactSubmit}
-              onClose={() => {
-                setShowContactForm(false)
-                setContactStatus('')
-              }}
-            />
-          )}
         </div>
-
-          <form onSubmit={handleSubmit} className="mt-4 text-[13px] text-green-300 whitespace-pre-line">
-          <div className="flex items-center gap-2 mt-2 text-green-200">
-            <span className="text-green-400">{promptSymbol}</span>
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              className="bg-transparent border-none outline-none text-green-200 w-full placeholder:text-green-500/50"
-              placeholder="help"
-              autoFocus
-            />
-          </div>
-        </form>
-      </div>
-      <div className="w-full border-t border-green-500/10 bg-[#021005]/90 px-5 py-3 flex items-center justify-between text-[11px] text-green-300">
-        <span>[SYSTEM] All connections encrypted • TOR enabled</span>
-        <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-200">ONLINE</span>
-      </div>
-    </div>
-  ) : (
-    <div className={bootRootClass}>
-      {bootHistory.map((item, index) => (
-        <div key={index} className="whitespace-pre-line mb-1">
-          {item.progress !== undefined ? (
-            <>
-              <div>{item.output}</div>
-              <div className="mt-1 h-2 w-full rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className={`h-full rounded-full bg-gradient-to-r from-green-400 via-lime-300 to-green-600 ${progressWidths[Math.min(10, Math.floor((item.progress ?? 0) / 10))]}`}
-                />
-              </div>
-            </>
-          ) : (
-            item.output
-          )}
-        </div>
-      ))}
+      )}
     </div>
   )
 }
